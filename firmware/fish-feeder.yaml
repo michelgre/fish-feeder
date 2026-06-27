@@ -45,9 +45,9 @@ external_components:
 fish_feeder:
   id: feeder
   servo: feeder_servo
-  #open_angle: 90°
-  #close_angle: 0°
-  #open_duration: 300ms
+  open_angle: 90°
+  close_angle: 0°
+  open_duration: 300ms
 
 # -----------------------
 # ACTION HOME ASSISTANT
