@@ -1,0 +1,15 @@
+# ESPHome secrets
+firmware/secrets.yaml
+
+# ESPHome build artifacts
+.esphome/
+.build/
+**/.pioenvs/
+**/.piolibdeps/
+
+# Python cache
+__pycache__/
+*.pyc
+
+# VSCode
+.vscode/*.log

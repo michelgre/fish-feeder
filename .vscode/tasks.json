@@ -1,0 +1,23 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "ESPHome: Compile",
+      "type": "shell",
+      "command": "esphome compile firmware/fish-feeder.yaml",
+      "group": "build"
+    },
+    {
+      "label": "ESPHome: Upload",
+      "type": "shell",
+      "command": "esphome run firmware/fish-feeder.yaml",
+      "group": "build"
+    },
+    {
+      "label": "ESPHome: Logs",
+      "type": "shell",
+      "command": "esphome logs firmware/fish-feeder.yaml",
+      "group": "test"
+    }
+  ]
+}
