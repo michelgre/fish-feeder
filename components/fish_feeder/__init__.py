@@ -20,8 +20,8 @@ CONFIG_SCHEMA = cv.Schema(
 
         cv.Required(CONF_SERVO): cv.use_id(servo.Servo),
 
-        cv.Optional(CONF_OPEN_ANGLE, default=90): cv.angle,
-        cv.Optional(CONF_CLOSE_ANGLE, default=0): cv.angle,
+        cv.Optional(CONF_OPEN_ANGLE, default=90): cv.float_range(min=0.0, max=180.0),
+        cv.Optional(CONF_CLOSE_ANGLE, default=0): cv.float_range(min=0.0, max=180.0),
 
         cv.Optional(CONF_OPEN_DURATION, default="300ms"): cv.positive_time_period_milliseconds,
     }
@@ -37,4 +37,4 @@ async def to_code(config):
 
     cg.add(var.set_open_angle(config[CONF_OPEN_ANGLE]))
     cg.add(var.set_close_angle(config[CONF_CLOSE_ANGLE]))
-    cg.add(var.set_open_duration(config[CONF_OPEN_DURATION]))
+    cg.add(var.set_open_duration(config[CONF_OPEN_DURATION].total_milliseconds))
