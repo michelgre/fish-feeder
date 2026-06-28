@@ -96,11 +96,11 @@ fish_feeder:
   close_angle: 0
   open_duration: 300ms
 
-#sensor:
-#  - platform: fish_feeder
-#    fish_feeder_id: feeder
-#    feed_count:
-#      name: "Feed Count"
+sensor:
+  - platform: fish_feeder
+    fish_feeder_id: feeder
+    feed_count:
+      name: "Feed Count"
 
 # -----------------------
 # ACTION HOME ASSISTANT

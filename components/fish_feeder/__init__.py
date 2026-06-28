@@ -7,7 +7,7 @@ from esphome import automation
 
 print(">>> fish_feeder __init__ loaded")
 
-DEPENDENCIES = ["servo"]
+DEPENDENCIES = ["servo", "sensor"]
 
 fish_feeder_ns = cg.esphome_ns.namespace("fish_feeder")
 FishFeeder = fish_feeder_ns.class_("FishFeeder", cg.Component)
@@ -43,3 +43,4 @@ async def to_code(config):
     cg.add(var.set_open_duration(config[CONF_OPEN_DURATION].total_milliseconds))
 
 from . import actions
+from . import sensor

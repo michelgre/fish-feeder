@@ -3,8 +3,16 @@
 #include "esphome/core/component.h"
 #include "esphome/components/servo/servo.h"
 #include "esphome/core/preferences.h"
+#include "esphome/components/sensor/sensor.h"
+
 #include "State.h"
 #include "PersistentData.h"
+
+namespace esphome {
+namespace sensor {
+class Sensor;
+}
+}
 
 namespace esphome {
 namespace fish_feeder {
@@ -29,6 +37,7 @@ class FishFeeder : public Component {
   float get_setup_priority() const override {
     return esphome::setup_priority::BEFORE_CONNECTION;
   }
+  void set_feed_count_sensor(sensor::Sensor *sensor);
 
  private:
   float open_angle_{90};
@@ -38,11 +47,13 @@ class FishFeeder : public Component {
   void close_servo_();
   void set_state_(State state);
   void publish_state_();
+  sensor::Sensor *feed_count_sensor_{nullptr};
 
   // Persistant status
   void load_persistent_data_();
   void save_persistent_data_();
   void reset_counter();
+  void publish_feed_count_();
 
  protected:
   servo::Servo *servo_{nullptr};

@@ -22,6 +22,7 @@ void FishFeeder::setup() {
   set_state_(State::IDLE);
   pref_ = global_preferences->make_preference<PersistentData>(fnv1_hash("fish_feeder"));
   load_persistent_data_();
+  publish_feed_count_();
 
   ESP_LOGI(TAG, "setup()");
   ESP_LOGI(TAG, "servo = %p", servo_);
@@ -51,6 +52,7 @@ void FishFeeder::feed() {
 
     persistent_.feed_count++;
     save_persistent_data_();
+    publish_feed_count_();
     ESP_LOGI(TAG, "Feed done (count=%u)", persistent_.feed_count);
     set_state_(State::IDLE);
   });
@@ -86,6 +88,7 @@ void FishFeeder::close_servo_() {
 
 void FishFeeder::reset() {
     reset_counter();
+    publish_feed_count_();
 }
 
 void FishFeeder::reset_counter() {
@@ -114,6 +117,16 @@ void FishFeeder::save_persistent_data_() {
 
 void FishFeeder::publish_state_() {
   // TODO
+}
+
+void FishFeeder::set_feed_count_sensor(sensor::Sensor *sensor) {
+  this->feed_count_sensor_ = sensor;
+}
+
+void FishFeeder::publish_feed_count_() {
+  if (this->feed_count_sensor_ != nullptr) {
+    this->feed_count_sensor_->publish_state(this->persistent_.feed_count);
+  }
 }
 
 }  // namespace fish_feeder
