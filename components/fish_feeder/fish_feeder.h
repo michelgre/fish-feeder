@@ -43,6 +43,7 @@ class FishFeeder : public Component {
   float open_angle_{90};
   float close_angle_{0};
   uint32_t open_duration_ms_{300};
+  float angle_to_level(float angle);
   void open_servo_();
   void close_servo_();
   void set_state_(State state);

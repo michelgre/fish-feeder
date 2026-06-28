@@ -73,17 +73,21 @@ void FishFeeder::set_state_(State state) {
   publish_state_();
 }
 
+float FishFeeder::angle_to_level(float angle) {
+  return (angle - 90.0f) / 90.0f;
+}
+
 // Servo control
 void FishFeeder::open_servo_() {
   ESP_LOGD(TAG, "Opening servo");
   set_state_(State::OPENING);
-  servo_->write(open_angle_);
+  servo_->write(angle_to_level(open_angle_));
 }
 
 void FishFeeder::close_servo_() {
   ESP_LOGD(TAG, "Closing servo");
   set_state_(State::CLOSING);
-  servo_->write(close_angle_);
+  servo_->write(angle_to_level(close_angle_));
 }
 
 void FishFeeder::reset() {
