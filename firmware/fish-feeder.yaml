@@ -1,6 +1,16 @@
 esphome:
   name: fish-feeder
   friendly_name: Fish Feeder
+  on_boot:
+    priority: 600
+    then:
+      - light.turn_on:
+          id: status_led
+          red: 80%
+          green: 35%
+          blue: 0%
+          brightness: 30%
+          
 
 esp32:
   board: esp32-s3-devkitc-1
@@ -19,6 +29,44 @@ wifi:
 
 captive_portal:
 
+
+# ------------------
+# LED RGB onboard
+# ------------------
+globals:
+  - id: led_state
+    type: bool
+    initial_value: "false"
+
+light:
+  - platform: esp32_rmt_led_strip
+    id: status_led
+    pin: GPIO21       # ou GPIO48 
+    chipset: WS2812
+    num_leds: 1
+    rgb_order: GRB
+    internal: true
+    restore_mode: ALWAYS_OFF
+
+interval:
+  - interval: 500ms
+    then:
+      - if:
+          condition:
+            lambda: "return id(led_state);"
+          then:
+            - light.turn_on:
+                id: status_led
+                green: 100%
+                blue: 0%
+                red: 0%
+                brightness: 30%
+          else:
+            - light.turn_off:
+                id: status_led
+      - lambda: |-
+          id(led_state) = !id(led_state);
+
 # -----------------------
 # SERVO (ESPHome natif)
 # -----------------------
@@ -33,7 +81,6 @@ servo:
     output: servo_pwm
     min_level: 3%
     max_level: 12%
-
 # -----------------------
 # FISH FEEDER COMPONENT
 # -----------------------

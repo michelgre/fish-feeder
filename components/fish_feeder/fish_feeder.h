@@ -2,7 +2,9 @@
 
 #include "esphome/core/component.h"
 #include "esphome/components/servo/servo.h"
+#include "esphome/core/preferences.h"
 #include "State.h"
+#include "PersistentData.h"
 
 namespace esphome {
 namespace fish_feeder {
@@ -36,10 +38,16 @@ class FishFeeder : public Component {
   void close_servo_();
   void set_state_(State state);
 
+  // Persistant status
+  void load_persistent_data_();
+  void save_persistent_data_();
+  void reset_counter();
+
  protected:
   servo::Servo *servo_{nullptr};
   State  state_{State ::IDLE};
-  uint32_t feed_count_{0};
+  ESPPreferenceObject pref_;
+  PersistentData persistent_;
 };
 
 }  // namespace fish_feeder

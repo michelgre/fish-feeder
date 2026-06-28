@@ -16,14 +16,15 @@ void FishFeeder::setup() {
     return;
   }
 
-  feed_count_ = 0;
   close_servo_();
   delay(BOOT_SERVO_SETTLE_MS); // Wait enough to get it closed
   set_state_(State::IDLE);
+  pref_ = global_preferences->make_preference<PersistentData>(fnv1_hash("fish_feeder"));
+  load_persistent_data_();
 
   ESP_LOGI(TAG, "setup()");
   ESP_LOGI(TAG, "servo = %p", servo_);
-  ESP_LOGI(TAG, "feed_count = %u", feed_count_);
+  ESP_LOGI(TAG, "feed_count = %u", persistent_.feed_count);
   ESP_LOGI(TAG, "State: %s", FishFeederState::to_string(state_));
   ESP_LOGI(TAG, "Fish Feeder ready");
 }
@@ -47,15 +48,11 @@ void FishFeeder::feed() {
 
     state_ = State::IDLE;
 
-    feed_count_++;
-    ESP_LOGI(TAG, "Feed done (count=%u)", feed_count_);
+    persistent_.feed_count++;
+    save_persistent_data_();
+    ESP_LOGI(TAG, "Feed done (count=%u)", persistent_.feed_count);
     set_state_(State::IDLE);
   });
-}
-
-void FishFeeder::reset() {
-  ESP_LOGI(TAG, "Reset feed counter");
-  feed_count_ = 0;
 }
 
 void FishFeeder::dump_config() {
@@ -64,6 +61,7 @@ void FishFeeder::dump_config() {
   ESP_LOGCONFIG(TAG, "  Open angle: %.1f", open_angle_);
   ESP_LOGCONFIG(TAG, "  Close angle: %.1f", close_angle_);
   ESP_LOGCONFIG(TAG, "  Open duration: %u ms", open_duration_ms_);
+  ESP_LOGCONFIG(TAG, "  Feed count: %u", persistent_.feed_count);
 }
 
 void FishFeeder::set_state_(State state) {
@@ -84,6 +82,29 @@ void FishFeeder::close_servo_() {
   servo_->write(close_angle_);
 }
 
+void FishFeeder::reset_counter() {
+    persistent_.feed_count = 0;
+    save_persistent_data_();
+
+  ESP_LOGI(TAG, "Feed counter reset");
+}
+
+void FishFeeder::load_persistent_data_() {
+    if (!pref_.load(&persistent_)) {
+        ESP_LOGI(TAG, "No persistent data found");
+
+        persistent_.version = 1;
+        persistent_.feed_count = 0;
+
+        save_persistent_data_();
+    }
+
+    ESP_LOGI(TAG, "Feed count restored: %u", persistent_.feed_count);
+}
+
+void FishFeeder::save_persistent_data_() {
+    pref_.save(&persistent_);
+}
 
 }  // namespace fish_feeder
 }  // namespace esphome
