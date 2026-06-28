@@ -1,16 +1,19 @@
-# Fish Feeded
-#
-# Version pour ESP-32-C3 SuperMini
-#  - Pas de LED RGB
-#  - LED bleue sur GDIO8
-#
 esphome:
   name: fish-feeder
   friendly_name: Fish Feeder
+  on_boot:
+    priority: 600
+    then:
+      - light.turn_on:
+          id: status_led
+          red: 80%
+          green: 35%
+          blue: 0%
+          brightness: 30%
           
 
 esp32:
-  board: esp32-c3-devkitm-1 # esp32-s3-devkitc-1
+  board: esp32-s3-devkitc-1
   framework:
     type: esp-idf
 
@@ -39,22 +42,39 @@ globals:
     type: bool
     initial_value: "false"
 
-switch:
-  - platform: output
-    id: led_switch
-    output: led
+light:
+  - platform: esp32_rmt_led_strip
+    id: status_led
+    pin: GPIO21       # ou GPIO48 
+    chipset: WS2812
+    num_leds: 1
+    rgb_order: GRB
+    internal: true
+    restore_mode: ALWAYS_OFF
 
 interval:
   - interval: 500ms
     then:
-      - switch.toggle: led_switch
+      - if:
+          condition:
+            lambda: "return id(led_state);"
+          then:
+            - light.turn_on:
+                id: status_led
+                green: 100%
+                blue: 0%
+                red: 0%
+                brightness: 30%
+          else:
+            - light.turn_off:
+                id: status_led
+      - lambda: |-
+          id(led_state) = !id(led_state);
+
 # -----------------------
 # SERVO (ESPHome natif)
 # -----------------------
 output:
-  - platform: gpio
-    id: led
-    pin: GPIO8
   - platform: ledc
     id: servo_pwm
     pin: GPIO2
