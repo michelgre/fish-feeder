@@ -37,6 +37,7 @@ class FishFeeder : public Component {
   void open_servo_();
   void close_servo_();
   void set_state_(State state);
+  void publish_state_();
 
   // Persistant status
   void load_persistent_data_();

@@ -1,5 +1,6 @@
-#include "fish_feeder.h"
 #include "esphome/core/log.h"
+#include "fish_feeder.h"
+#include "automation.h"
 
 namespace esphome {
 namespace fish_feeder {
@@ -67,6 +68,7 @@ void FishFeeder::dump_config() {
 void FishFeeder::set_state_(State state) {
   state_ = state;
   ESP_LOGD(TAG, "State -> %s", FishFeederState::to_string(state_));
+  publish_state_();
 }
 
 // Servo control
@@ -80,6 +82,10 @@ void FishFeeder::close_servo_() {
   ESP_LOGD(TAG, "Closing servo");
   set_state_(State::CLOSING);
   servo_->write(close_angle_);
+}
+
+void FishFeeder::reset() {
+    reset_counter();
 }
 
 void FishFeeder::reset_counter() {
@@ -104,6 +110,10 @@ void FishFeeder::load_persistent_data_() {
 
 void FishFeeder::save_persistent_data_() {
     pref_.save(&persistent_);
+}
+
+void FishFeeder::publish_state_() {
+  // TODO
 }
 
 }  // namespace fish_feeder

@@ -96,16 +96,24 @@ fish_feeder:
   close_angle: 0
   open_duration: 300ms
 
+#sensor:
+#  - platform: fish_feeder
+#    fish_feeder_id: feeder
+#    feed_count:
+#      name: "Feed Count"
+
 # -----------------------
 # ACTION HOME ASSISTANT
 # -----------------------
 button:
   - platform: template
-    name: "Feed Fish"
-  #  on_press:
-  #    - fish_feeder.feed: feeder
+    name: Feed Fish
+    on_press:
+      - fish_feeder.feed:
+          id: feeder
 
   - platform: template
-    name: "Reset Feed Counter"
-  #  on_press:
-  #    - fish_feeder.reset: feeder
+    name: Reset Counter
+    on_press:
+      - fish_feeder.reset: 
+          id: feeder

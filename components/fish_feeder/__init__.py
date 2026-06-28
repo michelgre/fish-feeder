@@ -3,6 +3,9 @@ import esphome.config_validation as cv
 from esphome.components import servo
 from esphome.const import CONF_ID
 from esphome import pins
+from esphome import automation
+
+print(">>> fish_feeder __init__ loaded")
 
 DEPENDENCIES = ["servo"]
 
@@ -38,3 +41,5 @@ async def to_code(config):
     cg.add(var.set_open_angle(config[CONF_OPEN_ANGLE]))
     cg.add(var.set_close_angle(config[CONF_CLOSE_ANGLE]))
     cg.add(var.set_open_duration(config[CONF_OPEN_DURATION].total_milliseconds))
+
+from . import actions
