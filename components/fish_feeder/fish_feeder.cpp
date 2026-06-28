@@ -17,15 +17,15 @@ void FishFeeder::setup() {
   }
 
   feed_count_ = 0;
-  state_ = State::IDLE;
   close_servo_();
   delay(BOOT_SERVO_SETTLE_MS); // Wait enough to get it closed
+  set_state_(State::IDLE);
 
   ESP_LOGI(TAG, "setup()");
   ESP_LOGI(TAG, "servo = %p", servo_);
   ESP_LOGI(TAG, "feed_count = %u", feed_count_);
   ESP_LOGI(TAG, "State: %s", FishFeederState::to_string(state_));
-  ESP_LOGI(TAG, "Fish Feeder initialized");
+  ESP_LOGI(TAG, "Fish Feeder ready");
 }
 
 void FishFeeder::loop() {
@@ -33,12 +33,14 @@ void FishFeeder::loop() {
 }
 
 void FishFeeder::feed() {
-  if (state_ != State::IDLE)
+  if (state_ != State::IDLE) {
+    ESP_LOGW(TAG, "Feed ignored (state=%s)",
+             FishFeederState::to_string(state_));
     return;
+  }
 
-  state_ = State::OPENING;
   open_servo_();
-  state_ = State::WAITING;
+  set_state_(State::WAITING);
 
   set_timeout("close-servo", open_duration_ms_, [this]() {
     close_servo_();
@@ -47,6 +49,7 @@ void FishFeeder::feed() {
 
     feed_count_++;
     ESP_LOGI(TAG, "Feed done (count=%u)", feed_count_);
+    set_state_(State::IDLE);
   });
 }
 
@@ -57,15 +60,30 @@ void FishFeeder::reset() {
 
 void FishFeeder::dump_config() {
   ESP_LOGCONFIG(TAG, "Fish Feeder");
-  ESP_LOGCONFIG(TAG, "  Open angle: %.1f°", open_angle_);
-  ESP_LOGCONFIG(TAG, "  Close angle: %.1f°", close_angle_);
-  ESP_LOGCONFIG(TAG, "  Open duration: %u ms", open_duration_ms_);
-  ESP_LOGCONFIG(TAG, "Fish Feeder");
   ESP_LOGCONFIG(TAG, "  Servo configured: %s", servo_ != nullptr ? "yes" : "no");
   ESP_LOGCONFIG(TAG, "  Open angle: %.1f", open_angle_);
   ESP_LOGCONFIG(TAG, "  Close angle: %.1f", close_angle_);
   ESP_LOGCONFIG(TAG, "  Open duration: %u ms", open_duration_ms_);
 }
+
+void FishFeeder::set_state_(State state) {
+  state_ = state;
+  ESP_LOGD(TAG, "State -> %s", FishFeederState::to_string(state_));
+}
+
+// Servo control
+void FishFeeder::open_servo_() {
+  ESP_LOGD(TAG, "Opening servo");
+  set_state_(State::OPENING);
+  servo_->write(open_angle_);
+}
+
+void FishFeeder::close_servo_() {
+  ESP_LOGD(TAG, "Closing servo");
+  set_state_(State::CLOSING);
+  servo_->write(close_angle_);
+}
+
 
 }  // namespace fish_feeder
 }  // namespace esphome

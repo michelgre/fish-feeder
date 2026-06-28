@@ -1,3 +1,4 @@
+#pragma once
 namespace esphome {
 namespace fish_feeder {
 
